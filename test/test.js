@@ -285,3 +285,53 @@ test('with out options ignore header', async t => {
   })
   t.is(http.__cacher.cacheMap.size, 2)
 })
+
+test('use axios instance create method with baseUrl', async t => {
+  let httpWrapper = wrapper(axios, {
+    excludeHeaders: true
+  })
+  let reg = /users/
+  
+  httpWrapper.__addFilter(reg)
+
+  let http = httpWrapper.create({baseUrl: 'http://www.404forest.com:3000', timeout: 1000})
+
+  t.is(typeof http.post, 'function')
+  t.is(typeof http.get, 'function')
+
+  let response1 = await http.get('/users/jin5354')
+  t.is(response1.data.id, 6868950)
+  t.is(httpWrapper.__cacher.cacheMap.size, 1)
+
+  let response2 = await http.get('/users/jin5354')
+  t.is(response2.data.id, 6868950)
+
+
+  let postResponse = await http.post('/users/yyhappynice', { id: 10  })
+  t.is(postResponse.data.id, 10)
+})
+
+test('use axios instance create method with out baseUrl', async t => {
+  let httpWrapper = wrapper(axios, {
+    excludeHeaders: true
+  })
+  let reg = /users/
+  
+  httpWrapper.__addFilter(reg)
+
+  let http = httpWrapper.create()
+
+  t.is(typeof http.post, 'function')
+  t.is(typeof http.get, 'function')
+
+  let response1 = await http.get('http://www.404forest.com:3000/users/jin5354')
+  t.is(response1.data.id, 6868950)
+  t.is(httpWrapper.__cacher.cacheMap.size, 1)
+
+  let response2 = await http.get('http://www.404forest.com:3000/users/jin5354')
+  t.is(response2.data.id, 6868950)
+
+
+  let postResponse = await http.post('http://www.404forest.com:3000/users/yyhappynice', { id: 10  })
+  t.is(postResponse.data.id, 10)
+})

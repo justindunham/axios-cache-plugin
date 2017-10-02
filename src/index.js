@@ -84,6 +84,20 @@ export default function wrapper(instance, option) {
   }
 
   /**
+   * [create instance with base options]
+   * @param  {[opts]} axios options object
+   * @return {[axios instance with cache feature]}
+   */
+  axiosWithCache.create = function(opts={}) {
+    const baseUrl = (opts.hasOwnProperty('baseUrl')) ? opts.baseUrl : ''
+
+    return {
+      get: (...arg) => axiosWithCache.get(`${baseUrl}${arg[0]}`, Object.assign({}, opts, arg[1])),
+      post: (...arg) => instance.post(`${baseUrl}${arg[0]}`, Object.assign({}, opts, arg[1]))
+    }
+  }
+
+  /**
    * [__addFilter cacher instance addFilter function proxy]
    * @param  {[reg]} filter
    */
